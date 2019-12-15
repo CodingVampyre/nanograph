@@ -4,6 +4,6 @@
  * Author: Tobias Kavšek <tobiaskavsek@hotmail.de>
  */
 
-export class Minigraph {
+export class Nanograph {
 
 }

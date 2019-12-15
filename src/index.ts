@@ -1,1 +1,1 @@
-export { Minigraph } from './minigraph.class';
+export { Nanograph } from './nanograph.class';

@@ -1,11 +1,11 @@
 {
-	"name": "minigraph",
+	"name": "nanograph",
 	"version": "0.0.1",
 	"description": "minimalistic in-memory graph for metadata management",
-	"main": "build/index.js",
+	"main": "src/index.js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/CodingVampyre/minigraph"
+		"url": "https://github.com/CodingVampyre/nanograph"
 	},
 	"scripts": {
 		"test": "jest"
