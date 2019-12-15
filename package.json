@@ -1,21 +1,25 @@
 {
-  "name": "minigraph",
-  "version": "0.0.1",
-  "description": "minimalistic in-memory graph for metadata mangagement",
-  "main": "build/index.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "keywords": [
-    "graph",
-    "metadata"
-  ],
-  "author": "Tobias Kavsek",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^24.0.23",
-    "jest": "^24.9.0",
-    "ts-jest": "^24.2.0",
-    "typescript": "^3.7.3"
-  }
+	"name": "minigraph",
+	"version": "0.0.1",
+	"description": "minimalistic in-memory graph for metadata management",
+	"main": "build/index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/CodingVampyre/minigraph"
+	},
+	"scripts": {
+		"test": "jest"
+	},
+	"keywords": [
+		"graph",
+		"metadata"
+	],
+	"author": "Tobias Kavsek",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/jest": "^24.0.23",
+		"jest": "^24.9.0",
+		"ts-jest": "^24.2.0",
+		"typescript": "^3.7.3"
+	}
 }
