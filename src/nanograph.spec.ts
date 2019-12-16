@@ -6,22 +6,22 @@ describe('create entities', () => {
 
 		test('create a vertex', () => {
 			const nano: Nanograph = new Nanograph();
-			const { id } = nano.createVertex<string>('PERSON', 'John Doe');
+			const { _id } = nano.createVertex<string>('PERSON', 'John Doe');
 
-			expect(id).toBeDefined();
+			expect(_id).toBeDefined();
 			expect(nano.getVertexCount()).toBe(1);
 		});
 
 		test('create a vertex using interfaces', () => {
 			interface IPerson { firstName: string, familyName: string, balance: number };
 			const nano: Nanograph = new Nanograph();
-			const { id } = nano.createVertex<IPerson>('PERSON', {
+			const { _id } = nano.createVertex<IPerson>('PERSON', {
 				firstName: 'John',
 				familyName: 'Doe',
 				balance: 42,
 			});
 
-			expect(id).toBeDefined();
+			expect(_id).toBeDefined();
 			expect(nano.getVertexCount()).toBe(1);
 		});
 
@@ -31,9 +31,9 @@ describe('create entities', () => {
 
 		test('create edge', () => {
 			const nano: Nanograph = new Nanograph();
-			const { id: johnDoeId } = nano.createVertex<string>('PERSON', 'John Doe');
-			const { id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { id: friendshipId } = nano.createEdge('FRIENDSHIP', johnDoeId, janeDoeId);
+			const { _id: johnDoeId } = nano.createVertex<string>('PERSON', 'John Doe');
+			const { _id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
+			const { _id: friendshipId } = nano.createEdge('FRIENDSHIP', johnDoeId, janeDoeId);
 
 			expect(friendshipId).toBeDefined();
 		});
@@ -42,9 +42,9 @@ describe('create entities', () => {
 			const nano: Nanograph = new Nanograph();
 			interface IFriendship {since: number, distant: boolean}
 
-			const { id: johnDoeId } = nano.createVertex<string>('PERSON', 'John Doe');
-			const { id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { id: friendshipId } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId, janeDoeId, {
+			const { _id: johnDoeId } = nano.createVertex<string>('PERSON', 'John Doe');
+			const { _id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
+			const { _id: friendshipId } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId, janeDoeId, {
 				since: Date.now(),
 				distant: true,
 			});
@@ -57,8 +57,8 @@ describe('create entities', () => {
 			interface IFriendship {since: number, distant: boolean}
 
 			const johnDoeId = 'PERSON:32';
-			const { id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { id: friendshipId, error } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId, janeDoeId, {
+			const { _id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
+			const { _id: friendshipId, error } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId, janeDoeId, {
 				since: Date.now(),
 				distant: true,
 			});
@@ -78,29 +78,58 @@ describe('retrieve entities', () => {
 
 		test('by id', () => {
 			const nano: Nanograph = new Nanograph();
-			const { id } = nano.createVertex<string>('PERSON', 'John Doe');
-			const name: string = nano.findVertexById('PERSON', id);
+			const { _id } = nano.createVertex<string>('PERSON', 'John Doe');
+			const edge = nano
+				.findVertices('PERSON', { _id: { equals: {_id} } })
+				.as('persons')
+				.getFirst();
 
-			expect(name).toBe('John Doe');
+			expect(edge?.properties?.name).toEqual('John Doe')
 		});
 
 		test('by parameter', () => {
 			const nano: Nanograph = new Nanograph();
 			nano.createVertex<string>('PERSON', 'John Doe');
-			const name: string[] = nano.findVertexByProperties('PERSON', { name: { equals: 'John Doe' } });
+			const edges = nano
+				.findVertices('PERSON', { name: { equals: 'John Doe' } })
+				.as('persons')
+				.getAll('persons');
 
-			expect(name).toBe('John Doe');
+			expect(edges.persons).toHaveLength(1);
+			expect(edges[0]?.persons.properties?.name).toBe('John Doe');
 		});
 	});
 
 	describe('retrieve edge properties', () => {
 
 		test('by Id', () => {
+			const nano: Nanograph = new Nanograph();
+			const { _id: vertex1Id } = nano.createVertex<string>('PERSON', 'John Doe');
+			const { _id: vertex2Id } = nano.createVertex<string>('PERSON', 'Jane Doe');
+			const { _id: edgeId } = nano.createEdge<{type: string, since: number}>('FRIENDSHIP', vertex1Id, vertex2Id, {
+				type: 'platonic', since: Date.now(),
+			});
 
+			const edge = nano
+				.findEdges('FRIENDSHIP', { _id: { equals: edgeId } })
+				.getFirst();
 		});
 
 		test('by properties', () => {
+			const nano: Nanograph = new Nanograph();
+			const { _id: vertex1Id } = nano.createVertex<string>('PERSON', 'John Doe');
+			const { _id: vertex2Id } = nano.createVertex<string>('PERSON', 'Jane Doe');
+			const { _id: edgeId } = nano.createEdge<{type: string, since: number}>('FRIENDSHIP', vertex1Id, vertex2Id, {
+				type: 'platonic', since: Date.now(),
+			});
 
+			const edges = nano
+				.findEdges('FRIENDSHIP', { type: { equals: 'platonic' } })
+				.as('friendships')
+				.getAll('friendships');
+
+			expect(edges.friendships).toHaveLength(1);
+			expect(edges.friendships[0]._id).toBe(edgeId);
 		});
 
 	});
