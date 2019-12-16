@@ -13,6 +13,10 @@ export class Nanograph {
 
 	private edges: Edge[] = [];
 
+	private state: IQueryState = {
+		lastEntities: [],
+	};
+
 	public createVertex<T>(vertexLabel: string, properties?: T) {
 		const _id = '';
 		let error: Error | undefined = undefined;
@@ -35,15 +39,11 @@ export class Nanograph {
 		return this;
 	}
 
-	public as(name: string) {
-		return this;
-	}
-
-	public getFirst(...labels: string[]): Edge | Vertex | undefined {
+	public getFirst(): Edge | Vertex | undefined {
 		return undefined;
 	}
 
-	public getAll(...labels: string[]): Edge[] | Vertex[] {
+	public getAll(): Edge[] | Vertex[] {
 		return [];
 	}
 
@@ -55,4 +55,8 @@ export class Nanograph {
 		return this.edges.length;
 	}
 
+}
+
+interface IQueryState {
+	lastEntities: Edge[] | Vertex[] | undefined,
 }

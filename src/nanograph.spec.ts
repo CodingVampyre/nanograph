@@ -81,7 +81,6 @@ describe('retrieve entities', () => {
 			const { _id } = nano.createVertex<string>('PERSON', 'John Doe');
 			const edge = nano
 				.findVertices('PERSON', { _id: { equals: {_id} } })
-				.as('persons')
 				.getFirst();
 
 			expect(edge?.properties?.name).toEqual('John Doe')
@@ -92,11 +91,10 @@ describe('retrieve entities', () => {
 			nano.createVertex<string>('PERSON', 'John Doe');
 			const edges = nano
 				.findVertices('PERSON', { name: { equals: 'John Doe' } })
-				.as('persons')
-				.getAll('persons');
+				.getAll();
 
-			expect(edges.persons).toHaveLength(1);
-			expect(edges[0]?.persons.properties?.name).toBe('John Doe');
+			expect(edges).toHaveLength(1);
+			expect(edges[0]?.properties?.name).toBe('John Doe');
 		});
 	});
 
@@ -125,11 +123,10 @@ describe('retrieve entities', () => {
 
 			const edges = nano
 				.findEdges('FRIENDSHIP', { type: { equals: 'platonic' } })
-				.as('friendships')
-				.getAll('friendships');
+				.getAll();
 
-			expect(edges.friendships).toHaveLength(1);
-			expect(edges.friendships[0]._id).toBe(edgeId);
+			expect(edges).toHaveLength(1);
+			expect(edges[0]._id).toBe(edgeId);
 		});
 
 	});
