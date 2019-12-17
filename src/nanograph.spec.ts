@@ -133,13 +133,52 @@ describe('retrieve entities', () => {
 
 	describe('traversal', () => {
 
+		interface IPerson {
+			name: string;
+			gender: 'm' | 'f';
+		}
+		const nano: Nanograph = new Nanograph();
+		const { _id: johnDoeId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'John Doe', gender: 'm',
+		});
+		const { _id: janeDoeId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Jane Doe',
+			gender: 'f',
+		});
+		const { _id: jamesDoeId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'James Doe',
+			gender: 'm',
+		});
+		const { _id: marthaDoeId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Martha Doe',
+			gender: 'f',
+		});
+		const { _id: markusDoughId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Markus Dough',
+			gender: 'm',
+		});
+		const { _id: lindaDoughId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Linda Dough',
+			gender: 'f',
+		});
+		const { _id: magnussenDoughId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Magnussen Dough',
+			gender: 'm',
+		});
+		const { _id: luisaDoughId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Luisa Dough',
+			gender: 'f',
+		});
+		const { _id: sirDoughId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Sir Dough IV',
+			gender: 'm',
+		});
+		const { _id: isabellaDoughId } = nano.createVertex<IPerson>('PERSON', {
+			name: 'Isabella Dough',
+			gender: 'f',
+		});
+
 		test ('one iteration', () => {
-			const nano: Nanograph = new Nanograph();
-			const { _id: vertex1Id } = nano.createVertex<string>('PERSON', 'John Doe');
-			const { _id: vertex2Id } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { _id: vertex3Id } = nano.createVertex<string>('PERSON', 'John Snow');
-			const { _id: vertex4Id } = nano.createVertex<string>('PERSON', 'Jim Dough');
-			const { _id: vertex5Id } = nano.createVertex<string>('PERSON', 'Frank Sinatra');
 
 		});
 
