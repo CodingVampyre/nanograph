@@ -132,14 +132,8 @@ describe('retrieve entities', () => {
 	});
 
 	describe('traversal', () => {
-		interface IPerson {
-			name: string;
-			gender: 'm' | 'f';
-		}
-		interface IMarriage {
-			year: number,
-			lasting: boolean,
-		}
+		interface IPerson { name: string; gender: 'm' | 'f'; }
+		interface IMarriage { year: number; lasting: boolean; }
 
 		const nano: Nanograph = new Nanograph();
 		const { _id: johnDoeId } = nano.createVertex<IPerson>('PERSON', {
@@ -188,6 +182,15 @@ describe('retrieve entities', () => {
 		nano.createEdge<IMarriage>('MARRIED', sirDoughId, isabellaDoughId, {
 			year: 1931, lasting: false,
 		});
+
+		nano.createEdge('CHILDOF', johnDoeId, jamesDoeId);
+		nano.createEdge('CHILDOF', johnDoeId, marthaDoeId);
+		nano.createEdge('CHILDOF', marthaDoeId, markusDoughId);
+		nano.createEdge('CHILDOF', marthaDoeId, lindaDoughId);
+		nano.createEdge('CHILDOF', markusDoughId, magnussenDoughId);
+		nano.createEdge('CHILDOF', markusDoughId, luisaDoughId);
+		nano.createEdge('CHILDOF', magnussenDoughId, sirDoughId);
+		nano.createEdge('CHILDOF', magnussenDoughId, isabellaDoughId);
 
 		test ('one iteration', () => {
 
