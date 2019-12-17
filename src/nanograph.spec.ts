@@ -132,50 +132,61 @@ describe('retrieve entities', () => {
 	});
 
 	describe('traversal', () => {
-
 		interface IPerson {
 			name: string;
 			gender: 'm' | 'f';
 		}
+		interface IMarriage {
+			year: number,
+			lasting: boolean,
+		}
+
 		const nano: Nanograph = new Nanograph();
 		const { _id: johnDoeId } = nano.createVertex<IPerson>('PERSON', {
 			name: 'John Doe', gender: 'm',
 		});
 		const { _id: janeDoeId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Jane Doe',
-			gender: 'f',
+			name: 'Jane Doe', gender: 'f',
 		});
 		const { _id: jamesDoeId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'James Doe',
-			gender: 'm',
+			name: 'James Doe', gender: 'm',
 		});
 		const { _id: marthaDoeId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Martha Doe',
-			gender: 'f',
+			name: 'Martha Doe', gender: 'f',
 		});
 		const { _id: markusDoughId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Markus Dough',
-			gender: 'm',
+			name: 'Markus Dough', gender: 'm',
 		});
 		const { _id: lindaDoughId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Linda Dough',
-			gender: 'f',
+			name: 'Linda Dough', gender: 'f',
 		});
 		const { _id: magnussenDoughId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Magnussen Dough',
-			gender: 'm',
+			name: 'Magnussen Dough', gender: 'm',
 		});
 		const { _id: luisaDoughId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Luisa Dough',
-			gender: 'f',
+			name: 'Luisa Dough', gender: 'f',
 		});
 		const { _id: sirDoughId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Sir Dough IV',
-			gender: 'm',
+			name: 'Sir Dough IV', gender: 'm',
 		});
 		const { _id: isabellaDoughId } = nano.createVertex<IPerson>('PERSON', {
-			name: 'Isabella Dough',
-			gender: 'f',
+			name: 'Isabella Dough', gender: 'f',
+		});
+
+		nano.createEdge<IMarriage>('MARRIED', johnDoeId, janeDoeId, {
+			year: 2014, lasting: true,
+		});
+		nano.createEdge<IMarriage>('MARRIED', jamesDoeId, marthaDoeId, {
+			year: 1989, lasting: true,
+		});
+		nano.createEdge<IMarriage>('MARRIED', markusDoughId, lindaDoughId, {
+			year: 1965, lasting: false,
+		});
+		nano.createEdge<IMarriage>('MARRIED', magnussenDoughId, luisaDoughId, {
+			year: 1931, lasting: false,
+		});
+		nano.createEdge<IMarriage>('MARRIED', sirDoughId, isabellaDoughId, {
+			year: 1931, lasting: false,
 		});
 
 		test ('one iteration', () => {
