@@ -134,6 +134,12 @@ describe('retrieve entities', () => {
 	describe('traversal', () => {
 
 		test ('one iteration', () => {
+			const nano: Nanograph = new Nanograph();
+			const { _id: vertex1Id } = nano.createVertex<string>('PERSON', 'John Doe');
+			const { _id: vertex2Id } = nano.createVertex<string>('PERSON', 'Jane Doe');
+			const { _id: vertex3Id } = nano.createVertex<string>('PERSON', 'John Snow');
+			const { _id: vertex4Id } = nano.createVertex<string>('PERSON', 'Jim Dough');
+			const { _id: vertex5Id } = nano.createVertex<string>('PERSON', 'Frank Sinatra');
 
 		});
 
