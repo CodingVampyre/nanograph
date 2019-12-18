@@ -1,4 +1,5 @@
 import { Nanograph } from './';
+import {Edge} from "./graph/edge.class";
 
 describe('create entities', () => {
 
@@ -33,7 +34,7 @@ describe('create entities', () => {
 			const nano: Nanograph = new Nanograph();
 			const { _id: johnDoeId } = nano.createVertex<string>('PERSON', 'John Doe');
 			const { _id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { _id: friendshipId } = nano.createEdge('FRIENDSHIP', johnDoeId, janeDoeId);
+			const { _id: friendshipId } = nano.createEdge('FRIENDSHIP', johnDoeId!, janeDoeId!);
 
 			expect(friendshipId).toBeDefined();
 		});
@@ -44,7 +45,7 @@ describe('create entities', () => {
 
 			const { _id: johnDoeId } = nano.createVertex<string>('PERSON', 'John Doe');
 			const { _id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { _id: friendshipId } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId, janeDoeId, {
+			const { _id: friendshipId } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId!, janeDoeId!, {
 				since: Date.now(),
 				distant: true,
 			});
@@ -58,7 +59,7 @@ describe('create entities', () => {
 
 			const johnDoeId = 'PERSON:32';
 			const { _id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { _id: friendshipId, error } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId, janeDoeId, {
+			const { _id: friendshipId, error } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId!, janeDoeId!, {
 				since: Date.now(),
 				distant: true,
 			});
@@ -80,21 +81,21 @@ describe('retrieve entities', () => {
 			const nano: Nanograph = new Nanograph();
 			const { _id } = nano.createVertex<string>('PERSON', 'John Doe');
 			const edge = nano
-				.findVertices('PERSON', { _id: { equals: {_id} } })
+				.findVertices<string>('PERSON', { _id: { equals: {_id} } })
 				.getFirst();
 
-			expect(edge?.properties?.name).toEqual('John Doe')
+			expect(edge?.properties).toEqual('John Doe')
 		});
 
 		test('by parameter', () => {
 			const nano: Nanograph = new Nanograph();
 			nano.createVertex<string>('PERSON', 'John Doe');
 			const edges = nano
-				.findVertices('PERSON', { name: { equals: 'John Doe' } })
+				.findVertices<string>('PERSON', { name: { equals: 'John Doe' } })
 				.getAll();
 
 			expect(edges).toHaveLength(1);
-			expect(edges[0]?.properties?.name).toBe('John Doe');
+			expect(edges[0].properties).toBe('John Doe');
 		});
 	});
 
@@ -104,7 +105,7 @@ describe('retrieve entities', () => {
 			const nano: Nanograph = new Nanograph();
 			const { _id: vertex1Id } = nano.createVertex<string>('PERSON', 'John Doe');
 			const { _id: vertex2Id } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { _id: edgeId } = nano.createEdge<{type: string, since: number}>('FRIENDSHIP', vertex1Id, vertex2Id, {
+			const { _id: edgeId } = nano.createEdge<{type: string, since: number}>('FRIENDSHIP', vertex1Id!, vertex2Id!, {
 				type: 'platonic', since: Date.now(),
 			});
 
@@ -117,7 +118,7 @@ describe('retrieve entities', () => {
 			const nano: Nanograph = new Nanograph();
 			const { _id: vertex1Id } = nano.createVertex<string>('PERSON', 'John Doe');
 			const { _id: vertex2Id } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { _id: edgeId } = nano.createEdge<{type: string, since: number}>('FRIENDSHIP', vertex1Id, vertex2Id, {
+			const { _id: edgeId } = nano.createEdge<{type: string, since: number}>('FRIENDSHIP', vertex1Id!, vertex2Id!, {
 				type: 'platonic', since: Date.now(),
 			});
 
@@ -167,44 +168,62 @@ describe('retrieve entities', () => {
 			name: 'Isabella Dough', gender: 'f',
 		});
 
-		nano.createEdge<IMarriage>('MARRIED', johnDoeId, janeDoeId, {
+		nano.createEdge<IMarriage>('MARRIED', johnDoeId!, janeDoeId!, {
 			year: 2014, lasting: true,
 		});
-		nano.createEdge<IMarriage>('MARRIED', jamesDoeId, marthaDoeId, {
+		nano.createEdge<IMarriage>('MARRIED', jamesDoeId!, marthaDoeId!, {
 			year: 1989, lasting: true,
 		});
-		nano.createEdge<IMarriage>('MARRIED', markusDoughId, lindaDoughId, {
+		nano.createEdge<IMarriage>('MARRIED', markusDoughId!, lindaDoughId!, {
 			year: 1965, lasting: false,
 		});
-		nano.createEdge<IMarriage>('MARRIED', magnussenDoughId, luisaDoughId, {
+		nano.createEdge<IMarriage>('MARRIED', magnussenDoughId!, luisaDoughId!, {
 			year: 1931, lasting: false,
 		});
-		nano.createEdge<IMarriage>('MARRIED', sirDoughId, isabellaDoughId, {
+		nano.createEdge<IMarriage>('MARRIED', sirDoughId!, isabellaDoughId!, {
 			year: 1931, lasting: false,
 		});
 
-		nano.createEdge('CHILDOF', johnDoeId, jamesDoeId);
-		nano.createEdge('CHILDOF', johnDoeId, marthaDoeId);
-		nano.createEdge('CHILDOF', marthaDoeId, markusDoughId);
-		nano.createEdge('CHILDOF', marthaDoeId, lindaDoughId);
-		nano.createEdge('CHILDOF', markusDoughId, magnussenDoughId);
-		nano.createEdge('CHILDOF', markusDoughId, luisaDoughId);
-		nano.createEdge('CHILDOF', magnussenDoughId, sirDoughId);
-		nano.createEdge('CHILDOF', magnussenDoughId, isabellaDoughId);
+		nano.createEdge('CHILDOF', johnDoeId!, jamesDoeId!);
+		nano.createEdge('CHILDOF', johnDoeId!, marthaDoeId!);
+		nano.createEdge('CHILDOF', marthaDoeId!, markusDoughId!);
+		nano.createEdge('CHILDOF', marthaDoeId!, lindaDoughId!);
+		nano.createEdge('CHILDOF', markusDoughId!, magnussenDoughId!);
+		nano.createEdge('CHILDOF', markusDoughId!, luisaDoughId!);
+		nano.createEdge('CHILDOF', magnussenDoughId!, sirDoughId!);
+		nano.createEdge('CHILDOF', magnussenDoughId!, isabellaDoughId!);
 
 		test ('one iteration', () => {
+			const edges = nano
+				.findVertices('PERSON', { name: { equals: 'John Doe' } })
+				.over('CHILDOF').to('PERSON')
+				.getAll();
 
+			expect(edges).toHaveLength(2);
 		});
 
 		test('two iterations', () => {
+			const edges = nano
+				.findVertices('PERSON', { name: { equals: 'John Doe' } })
+				.over('CHILDOF').to('PERSON', { gender: 'm' })
+				.over('MARRIED').to('PERSON')
+				.getAll();
 
+			expect(edges).toHaveLength(1);
 		});
 
 		test('three iterations', () => {
+			const edges = nano
+				.findVertices('PERSON', { name: { equals: 'John Doe' } })
+				.over('CHILDOF').to('PERSON')
+				.over('CHILDOF').to('PERSON', {gender: 'f'})
+				.over('MARRIED').to('PERSON')
+				.getAll();
 
+			expect(edges).toHaveLength(2);
 		});
 
-	})
+	});
 
 });
 
