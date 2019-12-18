@@ -76,6 +76,14 @@ export class Nanograph {
 				if (vertex.properties === undefined) { return false; }
 				// compare properties
 				for (let filterPropertyKey of Object.keys(filterProperties)) {
+					let vertexProperty;
+
+					// check for id
+					if (filterPropertyKey === '_id') { vertexProperty = vertex._id; }
+					else { vertexProperty = vertex.properties[filterPropertyKey]; }
+
+					console.log(vertexProperty, 'compare against', filterProperties[filterPropertyKey]);
+
 					if (filterProperties.hasOwnProperty(filterPropertyKey)) {
 
 						console.debug(filterPropertyKey, filterProperties[filterPropertyKey]);
