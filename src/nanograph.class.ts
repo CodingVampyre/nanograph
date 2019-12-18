@@ -66,13 +66,22 @@ export class Nanograph {
 		return { _id: error ? undefined : _id, error };
 	}
 
-	public findVertices(label: string, properties?: { [key: string]: any }): this {
+	public findVertices(label: string, filterProperties?: { [key: string]: any }): this {
 		const foundVertices: Vertex[] = this.graph.vertices.filter((vertex) => {
 			// labels should match
 			if (vertex.label === label) {
-				// properties should match
-				if (properties !== undefined) {
+				// if no properties are set, no checks must be made
+				if (filterProperties === undefined) { return true; }
+				// if properties are given but the vertex itself has no properties, filter
+				if (vertex.properties === undefined) { return false; }
+				// compare properties
+				for (let filterPropertyKey of Object.keys(filterProperties)) {
+					if (filterProperties.hasOwnProperty(filterPropertyKey)) {
 
+						console.debug(filterPropertyKey, filterProperties[filterPropertyKey]);
+						console.debug(vertex.properties[filterPropertyKey]);
+
+					}
 				}
 			}
 		});
