@@ -1,12 +1,12 @@
-export abstract class GraphEntity<T = undefined> {
+export abstract class GraphEntity {
 
 	public _id: string;
 
 	public label: string;
 
-	properties?: T;
+	properties?: { [key: string]: any };
 
-	constructor(_id: string, label: string, properties?: T) {
+	protected constructor(_id: string, label: string, properties?: { [key: string]: any } ) {
 		this._id = _id;
 		this.label = label;
 		this.properties = properties;

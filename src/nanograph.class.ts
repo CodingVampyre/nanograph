@@ -25,7 +25,7 @@ export class Nanograph {
 	 * @param label
 	 * @param properties
 	 */
-	public createVertex<T = undefined>(label: string, properties?: T) {
+	public createVertex(label: string, properties?: { [key: string]: any} ) {
 		// create id
 		const _id = this.getId();
 		let error: Error | undefined = undefined;
@@ -34,7 +34,7 @@ export class Nanograph {
 			if (v._id === _id) { error = new Error('ERR_DUPLICATE_ID'); }
 		}
 		// insert vertex
-		const vertex: Vertex<T> = new Vertex<T>(_id, label, properties);
+		const vertex: Vertex = new Vertex(_id, label, properties);
 		this.graph.vertices.push(vertex);
 
 		return { _id: error ? undefined : _id, error };
@@ -47,7 +47,7 @@ export class Nanograph {
 	 * @param to
 	 * @param properties
 	 */
-	public createEdge<T = undefined>(label: string, from: string, to: string, properties?: T) {
+	public createEdge(label: string, from: string, to: string, properties?: { [key: string]: any }) {
 		const _id = this.getId();
 		let error: Error | undefined = undefined;
 		// check for duplicates
@@ -60,22 +60,19 @@ export class Nanograph {
 		const toVertex = this.graph.vertices.find(vertex => vertex._id === to);
 		if (toVertex === undefined) { error = new Error('ERR_VERTEX_MISSING'); }
 
-		const edge: Edge<T> = new Edge<T>(_id, label, from, to, properties);
+		const edge: Edge = new Edge(_id, label, from, to, properties);
 		this.graph.edges.push(edge);
 
 		return { _id: error ? undefined : _id, error };
 	}
 
-	public findVertices<T = undefined>(label: string, properties: {}): this {
+	public findVertices(label: string, properties?: { [key: string]: any }): this {
 		const foundVertices: Vertex[] = this.graph.vertices.filter((vertex) => {
 			// labels should match
 			if (vertex.label === label) {
 				// properties should match
-				for (let property of Object.keys(properties)) {
-					// check if property is not a member of the object prototype
-					if (properties.hasOwnProperty(property)) {
-						console.log(property);
-					}
+				if (properties !== undefined) {
+
 				}
 			}
 		});
@@ -83,15 +80,15 @@ export class Nanograph {
 		return this;
 	}
 
-	public findEdges<T = undefined>(label: string, properties: {}): this {
+	public findEdges(label: string, properties: { [key: string]: any }): this {
 		return this;
 	}
 
-	public over(label: string, properties?: {}): this {
+	public over(label: string, properties?: { [key: string]: any }): this {
 		return this;
 	}
 
-	public to(label: string, properties?: {}): this {
+	public to(label: string, properties?: { [key: string]: any }): this {
 		return this;
 	}
 

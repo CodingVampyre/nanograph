@@ -1,8 +1,8 @@
 import {GraphEntity} from "./graph-entity.abstract-class";
 
-export class Vertex<T = undefined> extends GraphEntity<T> {
+export class Vertex<T = undefined> extends GraphEntity {
 
-	constructor(_id: string, label: string, properties?: T) {
+	constructor(_id: string, label: string, properties?: { [key: string]: any }) {
 		super(_id, label, properties);
 	}
 

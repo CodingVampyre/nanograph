@@ -1,8 +1,8 @@
-import {GraphEntity} from "./graph-entity.abstract-class";
+import {GraphEntity} from './graph-entity.abstract-class';
 
-export class Edge<T = undefined> extends GraphEntity<T> {
+export class Edge<T = undefined> extends GraphEntity {
 
-	constructor(_id: string, label: string, fromId: string, toId: string, properties?: T) {
+	constructor(_id: string, label: string, fromId: string, toId: string, properties?: { [key: string]: any }) {
 		super(_id, label, properties);
 		this.fromId = fromId;
 		this.toId = toId;
