@@ -26,18 +26,18 @@ export class Nanograph {
 	 * @param properties
 	 */
 	public createVertex<T = undefined>(label: string, properties?: T) {
-		const _id = this.getId().toString();
+		// create id
+		const _id = this.getId();
 		let error: Error | undefined = undefined;
-
+		// check for duplicates
 		for (let v of this.graph.vertices) {
 			if (v._id === _id) { error = new Error('ERR_DUPLICATE_ID'); }
-			else {
-				const vertex: Vertex<T> = new Vertex<T>(_id, label, properties);
-				this.graph.vertices.push(vertex);
-			}
 		}
+		// insert vertex
+		const vertex: Vertex<T> = new Vertex<T>(_id, label, properties);
+		this.graph.vertices.push(vertex);
 
-		return { _id: error? _id : undefined, error };
+		return { _id: error ? undefined : _id, error };
 	}
 
 	/**
@@ -48,18 +48,22 @@ export class Nanograph {
 	 * @param properties
 	 */
 	public createEdge<T = undefined>(label: string, from: string, to: string, properties?: T) {
-		const _id = this.getId().toString();
+		const _id = this.getId();
 		let error: Error | undefined = undefined;
-
+		// check for duplicates
 		for (let e of this.graph.edges) {
 			if (e._id === _id) { error = new Error('ERR_DUPLICATE_ID'); }
-			else {
-				const edge: Edge<T> = new Edge<T>(_id, label, from, to, properties);
-				this.graph.edges.push(edge);
-			}
 		}
 
-		return { _id: error? _id : undefined, error };
+		const fromVertex = this.graph.vertices.find(vertex => vertex._id === from);
+		if (fromVertex === undefined) { error =  new Error('ERR_VERTEX_MISSING'); }
+		const toVertex = this.graph.vertices.find(vertex => vertex._id === to);
+		if (toVertex === undefined) { error = new Error('ERR_VERTEX_MISSING'); }
+
+		const edge: Edge<T> = new Edge<T>(_id, label, from, to, properties);
+		this.graph.edges.push(edge);
+
+		return { _id: error ? undefined : _id, error };
 	}
 
 	public findVertices<T = undefined>(label: string, properties: {}): this {

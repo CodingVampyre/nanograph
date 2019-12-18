@@ -7,9 +7,10 @@ describe('create entities', () => {
 
 		test('create a vertex', () => {
 			const nano: Nanograph = new Nanograph();
-			const { _id } = nano.createVertex<string>('PERSON', 'John Doe');
+			const vertexCreationResult = nano.createVertex<string>('PERSON', 'John Doe');
 
-			expect(_id).toBeDefined();
+			expect(vertexCreationResult.error).toBeUndefined();
+			expect(vertexCreationResult._id).toBeDefined();
 			expect(nano.getVertexCount()).toBe(1);
 		});
 
@@ -59,14 +60,14 @@ describe('create entities', () => {
 
 			const johnDoeId = 'PERSON:32';
 			const { _id: janeDoeId } = nano.createVertex<string>('PERSON', 'Jane Doe');
-			const { _id: friendshipId, error } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId!, janeDoeId!, {
+			const { _id: friendshipId, error } = nano.createEdge<IFriendship>('FRIENDSHIP', johnDoeId, janeDoeId!, {
 				since: Date.now(),
 				distant: true,
 			});
 
 			expect(friendshipId).toBeUndefined();
 			expect(error).toBeDefined();
-			expect((error as unknown as Error).message).toBe('ERR_VERTEX_NOT_FOUND');
+			expect((error as unknown as Error).message).toBe('ERR_VERTEX_MISSING');
 		});
 
 	});
