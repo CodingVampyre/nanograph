@@ -66,38 +66,77 @@ export class Nanograph {
 		return { _id: error ? undefined : _id, error };
 	}
 
-	public findVertices(label: string, filterProperties?: { [key: string]: any }): this {
-		const foundVertices: Vertex[] = this.graph.vertices.filter((vertex) => {
+	public findVertices(label: string, filterProperties?: { [key: string]: any } | string): this {
+		this.state.lastEntities = this.graph.vertices.filter((vertex) => {
 			// labels should match
 			if (vertex.label === label) {
 				// if no properties are set, no checks must be made
-				if (filterProperties === undefined) { return true; }
+				if (filterProperties === undefined) {
+					return true;
+				}
 				// if properties are given but the vertex itself has no properties, filter
-				if (vertex.properties === undefined) { return false; }
+				if (vertex.properties === undefined) {
+					return false;
+				}
+
+				// compare IDs
+				if (typeof filterProperties === 'string' && vertex._id === filterProperties) {
+					return true;
+				}
+
 				// compare properties
 				for (let filterPropertyKey of Object.keys(filterProperties)) {
-					let vertexProperty;
+					filterProperties = filterProperties as { [key: string]: any }; // there is no more string
+					const filterProperty = filterProperties[filterPropertyKey];
+					const vertexProperty = vertex.properties[filterPropertyKey];
 
-					// check for id
-					if (filterPropertyKey === '_id') { vertexProperty = vertex._id; }
-					else { vertexProperty = vertex.properties[filterPropertyKey]; }
-
-					console.log(vertexProperty, 'compare against', filterProperties[filterPropertyKey]);
-
-					if (filterProperties.hasOwnProperty(filterPropertyKey)) {
-
-						console.debug(filterPropertyKey, filterProperties[filterPropertyKey]);
-						console.debug(vertex.properties[filterPropertyKey]);
-
+					// equality check
+					if (filterProperty.equals !== vertexProperty) {
+						return false;
 					}
 				}
+
+				// true if all parameters are compared successfully
+				return true;
 			}
 		});
-		this.state.lastEntities = foundVertices;
 		return this;
 	}
 
-	public findEdges(label: string, properties: { [key: string]: any }): this {
+	public findEdges(label: string, filterProperties: { [key: string]: any } | string): this {
+		this.state.lastEntities = this.graph.edges.filter((edge) => {
+			// labels should match
+			if (edge.label === label) {
+				// if no properties are set, no checks must be made
+				if (filterProperties === undefined) {
+					return true;
+				}
+				// if properties are given but the vertex itself has no properties, filter
+				if (edge.properties === undefined) {
+					return false;
+				}
+
+				// compare IDs
+				if (typeof filterProperties === 'string' && edge._id === filterProperties) {
+					return true;
+				}
+
+				// compare properties
+				for (let filterPropertyKey of Object.keys(filterProperties)) {
+					filterProperties = filterProperties as { [key: string]: any }; // there is no more string
+					const filterProperty = filterProperties[filterPropertyKey];
+					const vertexProperty = edge.properties[filterPropertyKey];
+
+					// equality check
+					if (filterProperty.equals !== vertexProperty) {
+						return false;
+					}
+				}
+
+				// true if all parameters are compared successfully
+				return true;
+			}
+		});
 		return this;
 	}
 

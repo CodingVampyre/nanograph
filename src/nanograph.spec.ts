@@ -80,7 +80,7 @@ describe('retrieve entities', () => {
 			const nano: Nanograph = new Nanograph();
 			const { _id } = nano.createVertex('PERSON', {name: 'John Doe'});
 			const edge = nano
-				.findVertices('PERSON', { _id: { equals: {_id} } })
+				.findVertices('PERSON', _id )
 				.getFirst();
 
 			expect(edge?.properties?.name).toEqual('John Doe')
@@ -94,7 +94,7 @@ describe('retrieve entities', () => {
 				.getAll();
 
 			expect(edges).toHaveLength(1);
-			expect(edges[0].properties).toBe('John Doe');
+			expect(edges[0].properties?.name).toBe('John Doe');
 		});
 	});
 
