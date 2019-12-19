@@ -1,5 +1,4 @@
 import { Nanograph } from './';
-import {Edge} from "./graph/edge.class";
 
 describe('create entities', () => {
 
@@ -14,7 +13,7 @@ describe('create entities', () => {
 			expect(nano.getVertexCount()).toBe(1);
 		});
 
-		test('create a vertex using interfaces', () => {
+		test('create a vertex multiple properties', () => {
 			const nano: Nanograph = new Nanograph();
 			const { _id } = nano.createVertex('PERSON', {
 				firstName: 'John',
@@ -190,18 +189,18 @@ describe('retrieve entities', () => {
 		nano.createEdge('CHILDOF', magnussenDoughId!, isabellaDoughId!);
 
 		test ('one iteration', () => {
-			const edges = nano
+			const vertices = nano
 				.findVertices('PERSON', { name: { equals: 'John Doe' } })
 				.over('CHILDOF').to('PERSON')
 				.getAll();
 
-			expect(edges).toHaveLength(2);
+			expect(vertices).toHaveLength(2);
 		});
 
 		test('two iterations', () => {
 			const edges = nano
 				.findVertices('PERSON', { name: { equals: 'John Doe' } })
-				.over('CHILDOF').to('PERSON', { gender: 'm' })
+				.over('CHILDOF').to('PERSON', { gender: { equals: 'm' } })
 				.over('MARRIED').to('PERSON')
 				.getAll();
 
@@ -209,14 +208,14 @@ describe('retrieve entities', () => {
 		});
 
 		test('three iterations', () => {
-			const edges = nano
+			const vertices = nano
 				.findVertices('PERSON', { name: { equals: 'John Doe' } })
 				.over('CHILDOF').to('PERSON')
-				.over('CHILDOF').to('PERSON', {gender: 'f'})
+				.over('CHILDOF').to('PERSON', { gender: { equals: 'm' } })
 				.over('MARRIED').to('PERSON')
 				.getAll();
 
-			expect(edges).toHaveLength(2);
+			expect(vertices).toHaveLength(1);
 		});
 
 	});
