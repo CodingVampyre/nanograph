@@ -166,7 +166,28 @@ export class Nanograph {
 	}
 
 	public async deleteEdge(edgeId: string) {
-		this.graph.edges = this.graph.edges.filter((edge) => edge._id !== edgeId);
+		this.graph.edges = this.graph.edges.filter((edge) =>
+			edge._id !== edgeId);
+	}
+
+	public async updateVertex(vertexId: string, newProperties: {[key: string]: any}) {
+		this.graph.vertices.map((vertex) => {
+			if (vertex._id === vertexId) {
+				const keys = Object.keys(newProperties);
+				if (vertex.properties === undefined) { vertex.properties = {}; }
+				for (let key of keys) { vertex.properties[key] = newProperties[key]; }
+			}
+		});
+	}
+
+	public async updateEdge(edgeId: string, newProperties: {[key: string]: any}) {
+		this.graph.edges.map((edge) => {
+			if (edge._id === edgeId) {
+				const keys = Object.keys(newProperties);
+				if (edge.properties === undefined) { edge.properties = {}; }
+				for (let key of keys) { edge.properties[key] = newProperties[key]; }
+			}
+		});
 	}
 
 	public getVertexCount() {

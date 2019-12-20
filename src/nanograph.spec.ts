@@ -253,6 +253,30 @@ describe('delete entities', () => {
 
 });
 
-test('update entities', () => {
+describe('update entities', () => {
+
+	test('update vertices', () => {
+		const nano = new Nanograph();
+		const { _id } = nano.createVertex('ANIMAL', { name: 'Elephant', weight: 4500 });
+		nano.updateVertex(_id!, { weight: 6000, hasFur: false });
+		const vertex = nano
+			.findVertices('ANIMAL', { name: { equals: 'Elephant' } })
+			.getFirst();
+
+		expect(vertex?.properties).toMatchObject({ name: 'Elephant', weight: 6000, hasFur: false });
+	});
+
+	test('update edges', () => {
+		const nano = new Nanograph();
+		const { _id: v1Id } = nano.createVertex('PERSON', { name: 'John Doe' });
+		const { _id: v2Id } = nano.createVertex('COMPANY', { name: 'Corp Inc.', state: 'de' });
+		const { _id: eId } = nano.createEdge('WORKSAT', v1Id!, v2Id!, { since: 2003, isShareholder: false });
+		nano.updateEdge(eId!, { isShareHolder: true, holdings: 15 });
+		const edge = nano
+			.findEdges('WORKSAT', { since: { equals: 2003 } })
+			.getFirst();
+
+		expect(edge?.properties).toMatchObject({ since: 2003, isShareHolder: true, holdings: 15 });
+	});
 
 });
