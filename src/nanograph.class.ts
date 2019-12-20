@@ -156,6 +156,19 @@ export class Nanograph {
 		return entities;
 	}
 
+	public deleteVertex(vertexId: string) {
+		// remove vertices
+		this.graph.vertices = this.graph.vertices.filter((vertex) =>
+			vertex._id !== vertexId);
+		// remove all attached edges
+		this.graph.edges = this.graph.edges.filter((edge) =>
+			edge.fromId !== vertexId && edge.toId !== vertexId);
+	}
+
+	public async deleteEdge(edgeId: string) {
+		this.graph.edges = this.graph.edges.filter((edge) => edge._id !== edgeId);
+	}
+
 	public getVertexCount() {
 		return this.graph.vertices.length;
 	}

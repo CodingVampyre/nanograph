@@ -222,10 +222,37 @@ describe('retrieve entities', () => {
 
 });
 
-describe('remove entities', () => {
+describe('delete entities', () => {
+
+	test('remove a vertex', () => {
+		const nano = new Nanograph();
+		const { _id: johnDoeId } = nano.createVertex('PERSON', { name: 'John Doe' });
+		const { _id: janeDoeId } = nano.createVertex('PERSON', { name: 'Jane Doe' });
+		const { _id: edgeId } = nano.createEdge('MARRIED', janeDoeId!, johnDoeId!);
+		const beforeVertexCount = nano.getVertexCount();
+		const beforeEdgeCount = nano.getEdgeCount();
+		nano.deleteVertex(johnDoeId!);
+
+		expect(beforeVertexCount).toBe(2);
+		expect(beforeEdgeCount).toBe(1);
+		expect(nano.getVertexCount()).toBe(1);
+		expect(nano.getEdgeCount()).toBe(0);
+	});
+
+	test('remove an edge', () => {
+		const nano = new Nanograph();
+		const { _id: johnDoeId } = nano.createVertex('PERSON', { name: 'John Doe' });
+		const { _id: janeDoeId } = nano.createVertex('PERSON', { name: 'Jane Doe' });
+		const { _id: edgeId } = nano.createEdge('MARRIED', janeDoeId!, johnDoeId!);
+		const getEdgeCount = nano.getEdgeCount();
+		nano.deleteEdge(edgeId!);
+
+		expect(getEdgeCount).toBe(1);
+		expect(nano.getEdgeCount()).toBe(0);
+	});
 
 });
 
-describe('update entities', () => {
+test('update entities', () => {
 
 });
