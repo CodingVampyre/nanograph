@@ -51,3 +51,19 @@ const vertices = nano
     .over('MARRIED').to('PERSON') // searching for his wife, John Doe's grandmother
     .getAll();
 ```
+
+### Update Entities
+Both edges and vertices can be updated using update methods.
+Old values will be kept.
+If a value to update is already exiting, it will be overwritten.
+```typescript
+nano.updateVertex(vertexId, { weight: 6000, hasFur: false });
+nano.updateEdge(edgeId, { isShareHolder: true, holdings: 15 });
+```
+
+### Delete Entities
+Vertices and edges can be deleted by their id.
+```typescript
+nano.deleteEdge(edgeId);
+nano.deleteVertex(vertexid);
+```
