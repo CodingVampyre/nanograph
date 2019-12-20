@@ -10,19 +10,23 @@ import {IGraph} from "./graph/graph.interface";
 
 export class Nanograph {
 
+	/** contains entities and a counter to grant uniqueness to IDs */
 	private graph: IGraph = {vertices: [], edges: [], counter: 0};
 
+	/** cursor to work with currently selected entities */
 	private selectedEntities: Edge[] | Vertex[] = [];
 
 	/**
-	 *
+	 * returns a unique identifier by incrementing a counter
+	 * @return an id, a stringified number
 	 */
 	private getId(): string { return (this.graph.counter++).toString() }
 
 	/**
-	 *
-	 * @param label
-	 * @param properties
+	 * creates a new vertex in the graph
+	 * @param label category of a vertex to grant simpler management
+	 * @param properties a key value object containing data for an entitiy
+	 * @return an object containing the ID and an error object
 	 */
 	public createVertex(label: string, properties?: { [key: string]: any} ) {
 		// create id
@@ -40,11 +44,11 @@ export class Nanograph {
 	}
 
 	/**
-	 *
-	 * @param label
-	 * @param from
-	 * @param to
-	 * @param properties
+	 * creates a new edge connecting two vertices
+	 * @param label category of said label
+	 * @param from vertex id from which the edge will be drawn
+	 * @param to vertex id to which the edge will be drawn
+	 * @param properties metadata containing information about edges
 	 */
 	public createEdge(label: string, from: string, to: string, properties?: { [key: string]: any }) {
 		const _id = this.getId();
@@ -65,6 +69,12 @@ export class Nanograph {
 		return { _id: error ? undefined : _id, error };
 	}
 
+	/**
+	 * searches and caches a list of vertices matching provided data
+	 * @param label category of the vertex to find
+	 * @param filterProperties either an id as string or an object containing properties to filter
+	 * @return this
+	 */
 	public findVertices(label: string, filterProperties?: { [key: string]: any } | string): this {
 		this.selectedEntities = this.graph.vertices.filter((vertex) => {
 			// labels should match
@@ -78,12 +88,18 @@ export class Nanograph {
 				if (typeof filterProperties === 'string' && vertex._id === filterProperties) { return true; }
 
 				// compare properties
-				return this.compareProperties(filterProperties as {[key: string]: any}, vertex);
+				return Nanograph.compareProperties(filterProperties as {[key: string]: any}, vertex);
 			}
 		});
 		return this;
 	}
 
+	/**
+	 * finds edges by provided data and caches them
+	 * @param label category of edges
+	 * @param filterProperties either an edge id or an object containing properties to filter
+	 * @return this
+	 */
 	public findEdges(label: string, filterProperties: { [key: string]: any } | string): this {
 		this.selectedEntities = this.graph.edges.filter((edge) => {
 			// labels should match
@@ -95,12 +111,18 @@ export class Nanograph {
 				// compare IDs
 				if (typeof filterProperties === 'string' && edge._id === filterProperties) { return true; }
 				// compare properties
-				return this.compareProperties(filterProperties as {[key: string]: any}, edge);
+				return Nanograph.compareProperties(filterProperties as {[key: string]: any}, edge);
 			}
 		});
 		return this;
 	}
 
+	/**
+	 * jumps to an edge connected to a cached vertex and filters by optional properties
+	 * @param label label of an edge
+	 * @param properties optional data to filter unwanted edges
+	 * @return this
+	 */
 	public over(label: string, properties?: { [key: string]: any }): this {
 		// for every entity in the queue
 		const newEntities: Edge[] = [];
@@ -109,7 +131,7 @@ export class Nanograph {
 			for (let edge of this.graph.edges) {
 				if (edge.fromId === vertex._id && edge.label === label) {
 					if (properties !== undefined) {
-						if (this.compareProperties(properties, edge)) { newEntities.push(edge); }
+						if (Nanograph.compareProperties(properties, edge)) { newEntities.push(edge); }
 					} else { newEntities.push(edge); }
 				}
 			}
@@ -119,6 +141,12 @@ export class Nanograph {
 		return this;
 	}
 
+	/**
+	 * jumps from cached edges to connected vertices
+	 * @param label label of wanted vertices
+	 * @param properties optional to filter out unwanted vertices
+	 * @return this
+	 */
 	public to(label: string, properties?: { [key: string]: any }): this {
 		const newEntities: Vertex[] = [];
 
@@ -134,7 +162,7 @@ export class Nanograph {
 					// if not, the vertex is always valid
 					if (properties !== undefined) {
 						// compare properties and push vertex on success
-						const arePropertiesMatching = this.compareProperties(properties, vertex);
+						const arePropertiesMatching = Nanograph.compareProperties(properties, vertex);
 						if (arePropertiesMatching) { newEntities.push(vertex); }
 					} else { newEntities.push(vertex); }
 				}
@@ -144,19 +172,31 @@ export class Nanograph {
 		return this;
 	}
 
+	/**
+	 * returns the first cached element and clears the cache
+	 * @return an edge or a vertex if existing, undefined if not
+	 */
 	public getFirst(): Edge | Vertex | undefined {
 		const returnEntity = this.selectedEntities[0];
 		this.clearState();
 		return returnEntity;
 	}
 
+	/**
+	 * returns all cached vertices or edges and clears the cache
+	 * @return an array of edges or vertices
+	 */
 	public getAll(): Edge[] | Vertex[] {
 		const entities = this.selectedEntities;
 		this.clearState();
 		return entities;
 	}
 
-	public deleteVertex(vertexId: string) {
+	/**
+	 * deletes a vertex by id
+	 * @param vertexId vertex identifier
+	 */
+	public deleteVertex(vertexId: string): void {
 		// remove vertices
 		this.graph.vertices = this.graph.vertices.filter((vertex) =>
 			vertex._id !== vertexId);
@@ -165,12 +205,21 @@ export class Nanograph {
 			edge.fromId !== vertexId && edge.toId !== vertexId);
 	}
 
-	public async deleteEdge(edgeId: string) {
+	/**
+	 * deletes an edge by id
+	 * @param edgeId edge identifier
+	 */
+	public deleteEdge(edgeId: string): void {
 		this.graph.edges = this.graph.edges.filter((edge) =>
 			edge._id !== edgeId);
 	}
 
-	public async updateVertex(vertexId: string, newProperties: {[key: string]: any}) {
+	/**
+	 * updates a vertex
+	 * @param vertexId id of the vertex to be updated
+	 * @param newProperties an object containing values to write into the vertex
+	 */
+	public updateVertex(vertexId: string, newProperties: {[key: string]: any}): void {
 		this.graph.vertices.map((vertex) => {
 			if (vertex._id === vertexId) {
 				const keys = Object.keys(newProperties);
@@ -180,7 +229,12 @@ export class Nanograph {
 		});
 	}
 
-	public async updateEdge(edgeId: string, newProperties: {[key: string]: any}) {
+	/**
+	 * updates an edge
+	 * @param edgeId id of the edge to be updated
+	 * @param newProperties an object containing values to write into the vertex
+	 */
+	public updateEdge(edgeId: string, newProperties: {[key: string]: any}): void {
 		this.graph.edges.map((edge) => {
 			if (edge._id === edgeId) {
 				const keys = Object.keys(newProperties);
@@ -190,23 +244,44 @@ export class Nanograph {
 		});
 	}
 
-	public getVertexCount() {
+	/**
+	 * counts all vertices
+	 * @return how many vertices are in the graph
+	 */
+	public getVertexCount(): number {
 		return this.graph.vertices.length;
 	}
 
-	public getEdgeCount() {
+	/**
+	 * counts all edges
+	 * @return how many edges are in the graph
+	 */
+	public getEdgeCount(): number {
 		return this.graph.edges.length;
 	}
 
+	/**
+	 * displays all vertices, edges and the counter to enable outside handing
+	 * @return a graph
+	 */
 	public toObject(): IGraph {
 		return this.graph;
 	}
 
-	public fromObject(graph: IGraph) {
+	/**
+	 * takes a graph and overwrites the internal graph
+	 * @param graph an object containing vertices and edges
+	 */
+	public fromObject(graph: IGraph): void {
 		this.graph = graph;
 	}
 
-	private compareProperties(filterProperties: {[key: string]: any}, entity: Vertex | Edge ): boolean {
+	/**
+	 * compares properties in objects
+	 * @param filterProperties a list of properties to match in a vertex or edge
+	 * @param entity a vertex or edge containing properties
+	 */
+	private static compareProperties(filterProperties: {[key: string]: any}, entity: Vertex | Edge ): boolean {
 		if (entity.properties === undefined) return false;
 
 		for (let filterPropertyKey of Object.keys(filterProperties)) {
