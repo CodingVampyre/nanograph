@@ -297,6 +297,7 @@ export class Nanograph {
 		return true;
 	}
 
+	/** removes all entities from the cursor */
 	private clearState() { this.selectedEntities = []; }
 
 }
