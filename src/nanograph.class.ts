@@ -4,23 +4,38 @@
  * Author: Tobias Kavšek <tobiaskavsek@hotmail.de>
  */
 
-import {Vertex} from "./graph/vertex.class";
-import {Edge} from "./graph/edge.class";
-import {IGraph} from "./graph/graph.interface";
+import { Vertex } from './graph/vertex.class';
+import { Edge } from './graph/edge.class';
+import { IGraph } from './graph/graph.interface';
 
 export class Nanograph {
 
 	/** contains entities and a counter to grant uniqueness to IDs */
-	private graph: IGraph = {vertices: [], edges: [], counter: 0};
+	private graph: IGraph = { vertices: [], edges: [], counter: 0};
 
 	/** cursor to work with currently selected entities */
 	private selectedEntities: Edge[] | Vertex[] = [];
 
 	/**
-	 * returns a unique identifier by incrementing a counter
-	 * @return an id, a stringified number
+	 * compares properties in objects
+	 * @param filterProperties a list of properties to match in a vertex or edge
+	 * @param entity a vertex or edge containing properties
 	 */
-	private getId(): string { return (this.graph.counter++).toString() }
+	private static compareProperties(filterProperties: { [key: string]: any}, entity: Vertex | Edge ): boolean {
+		if (entity.properties === undefined) { return false; }
+
+		for (const filterPropertyKey of Object.keys(filterProperties)) {
+			filterProperties = filterProperties as { [key: string]: any }; // there is no more string
+			const filterProperty = filterProperties[filterPropertyKey];
+			const vertexProperty = entity.properties[filterPropertyKey];
+
+			// equality check
+			if (filterProperty.equals !== vertexProperty) { return false; }
+		}
+
+		// true if all parameters are compared successfully
+		return true;
+	}
 
 	/**
 	 * creates a new vertex in the graph
@@ -31,9 +46,9 @@ export class Nanograph {
 	public createVertex(label: string, properties?: { [key: string]: any} ) {
 		// create id
 		const _id = this.getId();
-		let error: Error | undefined = undefined;
+		let error: Error | undefined;
 		// check for duplicates
-		for (let v of this.graph.vertices) {
+		for (const v of this.graph.vertices) {
 			if (v._id === _id) { error = new Error('ERR_DUPLICATE_ID'); }
 		}
 		// insert vertex
@@ -52,15 +67,15 @@ export class Nanograph {
 	 */
 	public createEdge(label: string, from: string, to: string, properties?: { [key: string]: any }) {
 		const _id = this.getId();
-		let error: Error | undefined = undefined;
+		let error: Error | undefined;
 		// check for duplicates
-		for (let e of this.graph.edges) {
+		for (const e of this.graph.edges) {
 			if (e._id === _id) { error = new Error('ERR_DUPLICATE_ID'); }
 		}
 
-		const fromVertex = this.graph.vertices.find(vertex => vertex._id === from);
+		const fromVertex = this.graph.vertices.find((vertex) => vertex._id === from);
 		if (fromVertex === undefined) { error =  new Error('ERR_VERTEX_MISSING'); }
-		const toVertex = this.graph.vertices.find(vertex => vertex._id === to);
+		const toVertex = this.graph.vertices.find((vertex) => vertex._id === to);
 		if (toVertex === undefined) { error = new Error('ERR_VERTEX_MISSING'); }
 
 		const edge: Edge = new Edge(_id, label, from, to, properties);
@@ -88,7 +103,7 @@ export class Nanograph {
 				if (typeof filterProperties === 'string' && vertex._id === filterProperties) { return true; }
 
 				// compare properties
-				return Nanograph.compareProperties(filterProperties as {[key: string]: any}, vertex);
+				return Nanograph.compareProperties(filterProperties as { [key: string]: any}, vertex);
 			}
 		});
 		return this;
@@ -111,7 +126,7 @@ export class Nanograph {
 				// compare IDs
 				if (typeof filterProperties === 'string' && edge._id === filterProperties) { return true; }
 				// compare properties
-				return Nanograph.compareProperties(filterProperties as {[key: string]: any}, edge);
+				return Nanograph.compareProperties(filterProperties as { [key: string]: any}, edge);
 			}
 		});
 		return this;
@@ -126,9 +141,9 @@ export class Nanograph {
 	public over(label: string, properties?: { [key: string]: any }): this {
 		// for every entity in the queue
 		const newEntities: Edge[] = [];
-		for (let vertex of this.selectedEntities) {
+		for (const vertex of this.selectedEntities) {
 			// for every edge, look if it derices from a given vertex
-			for (let edge of this.graph.edges) {
+			for (const edge of this.graph.edges) {
 				if (edge.fromId === vertex._id && edge.label === label) {
 					if (properties !== undefined) {
 						if (Nanograph.compareProperties(properties, edge)) { newEntities.push(edge); }
@@ -151,9 +166,9 @@ export class Nanograph {
 		const newEntities: Vertex[] = [];
 
 		// for every entity in the queue
-		for (let edge of this.selectedEntities) {
+		for (const edge of this.selectedEntities) {
 			// for every edge, look if it derices from a given vertex
-			for (let vertex of this.graph.vertices) {
+			for (const vertex of this.graph.vertices) {
 				const areIdsMatching = (edge as Edge).toId === vertex._id;
 				const areLabelsMatching = vertex.label === label;
 
@@ -219,12 +234,12 @@ export class Nanograph {
 	 * @param vertexId id of the vertex to be updated
 	 * @param newProperties an object containing values to write into the vertex
 	 */
-	public updateVertex(vertexId: string, newProperties: {[key: string]: any}): void {
+	public updateVertex(vertexId: string, newProperties: { [key: string]: any}): void {
 		this.graph.vertices.map((vertex) => {
 			if (vertex._id === vertexId) {
 				const keys = Object.keys(newProperties);
-				if (vertex.properties === undefined) { vertex.properties = {}; }
-				for (let key of keys) { vertex.properties[key] = newProperties[key]; }
+				if (vertex.properties === undefined) { vertex.properties = { }; }
+				for (const key of keys) { vertex.properties[key] = newProperties[key]; }
 			}
 		});
 	}
@@ -234,12 +249,12 @@ export class Nanograph {
 	 * @param edgeId id of the edge to be updated
 	 * @param newProperties an object containing values to write into the vertex
 	 */
-	public updateEdge(edgeId: string, newProperties: {[key: string]: any}): void {
+	public updateEdge(edgeId: string, newProperties: { [key: string]: any}): void {
 		this.graph.edges.map((edge) => {
 			if (edge._id === edgeId) {
 				const keys = Object.keys(newProperties);
-				if (edge.properties === undefined) { edge.properties = {}; }
-				for (let key of keys) { edge.properties[key] = newProperties[key]; }
+				if (edge.properties === undefined) { edge.properties = { }; }
+				for (const key of keys) { edge.properties[key] = newProperties[key]; }
 			}
 		});
 	}
@@ -277,25 +292,10 @@ export class Nanograph {
 	}
 
 	/**
-	 * compares properties in objects
-	 * @param filterProperties a list of properties to match in a vertex or edge
-	 * @param entity a vertex or edge containing properties
+	 * returns a unique identifier by incrementing a counter
+	 * @return an id, a stringified number
 	 */
-	private static compareProperties(filterProperties: {[key: string]: any}, entity: Vertex | Edge ): boolean {
-		if (entity.properties === undefined) return false;
-
-		for (let filterPropertyKey of Object.keys(filterProperties)) {
-			filterProperties = filterProperties as { [key: string]: any }; // there is no more string
-			const filterProperty = filterProperties[filterPropertyKey];
-			const vertexProperty = entity.properties[filterPropertyKey];
-
-			// equality check
-			if (filterProperty.equals !== vertexProperty) { return false; }
-		}
-
-		// true if all parameters are compared successfully
-		return true;
-	}
+	private getId(): string { return (this.graph.counter++).toString(); }
 
 	/** removes all entities from the cursor */
 	private clearState() { this.selectedEntities = []; }

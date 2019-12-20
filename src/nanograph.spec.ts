@@ -1,3 +1,9 @@
+/**
+ * This code is licensed under the MIT-License.
+ *
+ * Author: Tobias Kavšek <tobiaskavsek@hotmail.de>
+ */
+
 import { Nanograph } from './';
 
 describe('create entities', () => {
@@ -6,7 +12,7 @@ describe('create entities', () => {
 
 		test('create a vertex', () => {
 			const nano: Nanograph = new Nanograph();
-			const vertexCreationResult = nano.createVertex('PERSON', {name: 'John Doe', });
+			const vertexCreationResult = nano.createVertex('PERSON', { name: 'John Doe' });
 
 			expect(vertexCreationResult.error).toBeUndefined();
 			expect(vertexCreationResult._id).toBeDefined();
@@ -31,8 +37,8 @@ describe('create entities', () => {
 
 		test('create edge', () => {
 			const nano: Nanograph = new Nanograph();
-			const { _id: johnDoeId } = nano.createVertex('PERSON', {name: 'John Doe'});
-			const { _id: janeDoeId } = nano.createVertex('PERSON', {name: 'Jane Doe'});
+			const { _id: johnDoeId } = nano.createVertex('PERSON', { name: 'John Doe' });
+			const { _id: janeDoeId } = nano.createVertex('PERSON', { name: 'Jane Doe' });
 			const { _id: friendshipId } = nano.createEdge('FRIENDSHIP', johnDoeId!, janeDoeId!);
 
 			expect(friendshipId).toBeDefined();
@@ -41,8 +47,8 @@ describe('create entities', () => {
 		test('create Edge with properties', () => {
 			const nano: Nanograph = new Nanograph();
 
-			const { _id: johnDoeId } = nano.createVertex('PERSON', {name: 'John Doe'});
-			const { _id: janeDoeId } = nano.createVertex('PERSON', {name: 'Jane Doe'});
+			const { _id: johnDoeId } = nano.createVertex('PERSON', { name: 'John Doe' });
+			const { _id: janeDoeId } = nano.createVertex('PERSON', { name: 'Jane Doe' });
 			const { _id: friendshipId } = nano.createEdge('FRIENDSHIP', johnDoeId!, janeDoeId!, {
 				since: Date.now(),
 				distant: true,
@@ -53,7 +59,6 @@ describe('create entities', () => {
 
 		test('fail on non existing vertices', () => {
 			const nano: Nanograph = new Nanograph();
-			interface IFriendship {since: number, distant: boolean}
 
 			const johnDoeId = 'PERSON:32';
 			const { _id: janeDoeId } = nano.createVertex('PERSON', { name: 'Jane Doe' });
@@ -77,12 +82,12 @@ describe('retrieve entities', () => {
 
 		test('by id', () => {
 			const nano: Nanograph = new Nanograph();
-			const { _id } = nano.createVertex('PERSON', {name: 'John Doe'});
+			const { _id } = nano.createVertex('PERSON', { name: 'John Doe' });
 			const edge = nano
 				.findVertices('PERSON', _id )
 				.getFirst();
 
-			expect(edge?.properties?.name).toEqual('John Doe')
+			expect(edge?.properties?.name).toEqual('John Doe');
 		});
 
 		test('by parameter', () => {
